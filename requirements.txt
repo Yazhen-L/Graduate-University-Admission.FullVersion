@@ -1,0 +1,16 @@
+streamlit
+streamlit-option-menu
+streamlit-extras
+streamlit-aggrid
+streamlit-shadcn-ui
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+plotly
+Pillow
+statsmodels
+requests
+ydata-profiling
+streamlit-pandas-profiling
