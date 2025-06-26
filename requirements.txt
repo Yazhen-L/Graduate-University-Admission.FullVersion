@@ -3,7 +3,7 @@ streamlit-option-menu
 streamlit-extras
 streamlit-aggrid
 streamlit-shadcn-ui
-pandas
+pandas>=2.2.2
 numpy
 matplotlib
 seaborn
