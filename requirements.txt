@@ -4,7 +4,7 @@ streamlit-extras
 streamlit-aggrid
 streamlit-shadcn-ui
 pandas>=2.2.2
-numpy
+numpy==1.24.4
 matplotlib
 seaborn
 scikit-learn
