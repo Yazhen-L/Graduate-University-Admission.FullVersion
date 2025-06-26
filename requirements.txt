@@ -10,7 +10,6 @@ seaborn
 scikit-learn
 plotly
 Pillow
-statsmodels
 requests
 
 xgboost
@@ -18,5 +17,6 @@ graphviz
 mlflow
 dagshub
 pycaret
+torch
 shap
 streamlit-shap
