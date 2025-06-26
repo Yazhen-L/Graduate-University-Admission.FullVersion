@@ -23,9 +23,6 @@ from io import StringIO
 import requests
 
 
-# from ydata_profiling import ProfileReport
-# from streamlit_pandas_profiling import st_profile_report
-
 # Below are newly added
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
@@ -279,7 +276,9 @@ if page == "Introduction 👩‍💼":
                 st.dataframe(df.head(10))
             else:
                 st.dataframe(df.tail(10))
-            
+                
+            #from ydata_profiling import ProfileReport
+            #from streamlit_pandas_profiling import st_profile_report
             #st.write("### Automated Report")
             #if st.button("Generate an Automated Report:"):
                 #st.balloons()
