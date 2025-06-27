@@ -952,7 +952,7 @@ elif page == "Prediction 📣":
                     os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
                     os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
                     
-                    st.success(f"✅ MLflow tracking configured successfully!")
+                    st.success(f"✅ MLflow tracking configured successfully! Here is the Link:")
                     st.markdown(f"[Click here to access MLflow UI]({tracking_uri})", unsafe_allow_html=True)
                     
                     try:
@@ -970,12 +970,7 @@ elif page == "Prediction 📣":
                     st.error("DAGSHUB_TOKEN has not been set up yet. Please check Streamlit Secrets.")
                 except Exception as e:
                     st.error(f"Error configuring MLflow: {str(e)}")
-
-                if st.button("⬅️ Back to Main Page"):
-                    st.session_state["mlflow_access"] = False
-                    st.session_state["mlflow_password_verified"] = False
-                    st.experimental_rerun()
-
+                    
                 
 
 elif page == "Explainability 📝":
