@@ -774,8 +774,6 @@ elif page == "Prediction 📣":
                                 mime="text/plain"
                             )
                     display_decision_tree_text(st.session_state.dt_model, st.session_state.feature_names)
-                else:
-                    st.warning("Decision tree model not available. Please train the decision tree model first!")
 
             # Display the metics and execution time
             def update_metrics(model_name, mae , mse, r2, exec_time):
