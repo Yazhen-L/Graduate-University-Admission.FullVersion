@@ -952,46 +952,40 @@ elif page == "Prediction 📣":
                     total_steps = 83
                     for step in range(total_steps):
                         st.session_state.pycaret_progress = (step + 1) / total_steps
+                        st.session_state.pycaret_step = step + 1
                         
-                        time.sleep(2.5) 
-                        
-                        if step % 10 == 0:
-                            st.session_state.pycaret_step = step
+                        #time.sleep(2.5) 
                             
                     top3_models = compare_models(n_select=3)
                     st.session_state.top3_models = top3_models
 
-                    for i, model in enumerate(top3_models, 1):
-                                with mlflow.start_run(run_name=f"Top Model {i}: {model.__class__.__name__}"):
-                                    model_name = f"admission_model_{i}"
+                    for i, model in enumerate(top3_models, 1):                
+                        with mlflow.start_run(run_name=f"Top Model {i}: {model.__class__.__name__}"):
+                            model_name = f"admission_model_{i}"
 
-                                    # Log model
-                                    #mlflow.sklearn.log_model(model, model_name)
+                            # Log model
+                            #mlflow.sklearn.log_model(model, model_name)
 
-                                    # Log parameters
-                                    params = model.get_params()
-                                    for key, value in params.items():
-                                        mlflow.log_param(key, value)
-                                    
-                                    y_test = admission_test["Chance of Admit "]
-                                    X_test = admission_test.drop("Chance of Admit ", axis=1)
-                                    y_pred = model.predict(X_test)
+                            # Log parameters
+                            params = model.get_params()
+                            for key, value in params.items():
+                                mlflow.log_param(key, value)
+                            
+                            y_test = admission_test["Chance of Admit "]
+                            X_test = admission_test.drop("Chance of Admit ", axis=1)
+                            y_pred = model.predict(X_test)
 
-                                    mae = mean_absolute_error(y_test, y_pred)
-                                    mse = mean_squared_error(y_test, y_pred)
-                                    r2 = r2_score(y_test, y_pred)
+                            mae = mean_absolute_error(y_test, y_pred)
+                            mse = mean_squared_error(y_test, y_pred)
+                            r2 = r2_score(y_test, y_pred)
 
-                                    mlflow.log_metric("mean_absolute_error", mae)
-                                    mlflow.log_metric("mean_squared_error", mse)
-                                    mlflow.log_metric("r_squared_score", r2)
+                            mlflow.log_metric("mean_absolute_error", mae)
+                            mlflow.log_metric("mean_squared_error", mse)
+                            mlflow.log_metric("r_squared_score", r2)
 
-                                    #mlflow.sklearn.log_model(model, f"top_model_{i}")
-
-                                    st.write(f"**Model {i}: {model.__class__.__name__}**")
-                                    st.write(f"Mean Absolute Error (MAE):  {mae:.4f} | Mean Squared Error (MSE):  {mse:.4f} | R-squared (R²):  {r2:.4f}")
-                                    dagshub_mlflow_url = "https://dagshub.com/Yazhen-L/First-Repo.mlflow" 
-                                    st.markdown(f"[Go to MLflow UI on DAGsHub](https://dagshub.com/Yazhen-L/First-Repo.mlflow)") 
-                                mlflow.end_run()
+                            #mlflow.sklearn.log_model(model, f"top_model_{i}")
+                        mlflow.end_run()
+                        
                     st.session_state.pycaret_status = "completed"
                     st.session_state.pycaret_message = "✅ Models Training is done!"
                 
@@ -999,6 +993,7 @@ elif page == "Prediction 📣":
                     # 处理错误
                     st.session_state.pycaret_status = "error"
                     st.session_state.pycaret_message = f"❌ Error: {str(e)}"
+
             
             if "pycaret_triggered" not in st.session_state:
                 st.session_state["pycaret_triggered"] = False
@@ -1008,6 +1003,7 @@ elif page == "Prediction 📣":
             # Load the top 3 models from session state if they exist
             if st.button("🚀 Run Comparison & Log Top 3"):
                 st.session_state["pycaret_triggered"] = True
+
             
             if st.session_state["pycaret_triggered"]:
                 if "pycaret_status" not in st.session_state:
@@ -1021,10 +1017,8 @@ elif page == "Prediction 📣":
                         st.error('Incorrect Password!')
                         st.stop()
                     else:
-                        st.success("Access Granted. Please wait ~3.5 min while PyCaret loads the top 3 models...")
-
                         if st.session_state.pycaret_status == "idle":
-                            st.success("Access Granted. Starting PyCaret comparison...")
+                            st.success("Access Granted. Please wait ~3.5 min while PyCaret loads the top 3 models...")
                             thread = threading.Thread(target=run_pycaret_comparison, daemon=True)
                             thread.start()
                             st.session_state.pycaret_status = "starting"
@@ -1035,13 +1029,15 @@ elif page == "Prediction 📣":
                             if st.session_state.pycaret_status == "starting":
                                 st.info("🚀 Loading PyCaret Comparison Task...")
                             else:
-                                st.info(f"🔄 In Progress: {int(st.session_state.pycaret_progress * 100)}% 完成")
+                                st.info(f"🔄 In Progress: {st.session_state.pycaret_step}/83 Finished ({int(st.session_state.pycaret_progress * 100)}%)")
                             
-                            if st.button("🔄 Refresh"):
-                                st.experimental_rerun()
+                            refresh_placeholder = st.empty()
+                            refresh_placeholder.text("Auto Refreshing...")
                             
-                            time.sleep(15)
-                            st.experimental_rerun()
+                            time.sleep(5)
+                            refresh_placeholder.empty()
+                            st.experimental_memo.clear()
+                            
                         elif st.session_state.pycaret_status == "completed":
                             st.success(st.session_state.pycaret_message)
                         
