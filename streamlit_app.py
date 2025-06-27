@@ -54,6 +54,32 @@ import sklearn.metrics as metrics
 plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
+def setup_environment():
+        graphviz_paths = [
+            '/usr/bin/graphviz/bin',
+            '/usr/local/bin',
+            '/usr/bin',
+            str(Path.home() / 'graphviz' / 'bin')
+        ]
+        
+        for path in graphviz_paths:
+            if Path(path).exists():
+                os.environ["PATH"] += os.pathsep + path
+        
+        try:
+            import graphviz
+            st.sidebar.success(f"Graphviz Python 库: {graphviz.__version__}")
+            
+            result = subprocess.run(['dot', '-V'], capture_output=True, text=True)
+            if result.returncode == 0:
+                st.sidebar.success(f"Graphviz: {result.stdout.strip()}")
+            else:
+                st.sidebar.warning("Graphviz is not found.")
+                st.sidebar.code(result.stderr)
+        except ImportError:
+            st.sidebar.error("Python graphviz cann't be downloaded.")
+setup_environment()
+
 
 # Load the dataset
 df = pd.read_csv("Admission_Predict_Ver1.1.csv")
@@ -752,37 +778,66 @@ elif page == "Prediction 📣":
                 st.graphviz_chart(graph)
 
                 # Convert to a graph using Graphviz
-                graph2 = graphviz.Source(dot_data)
+                #graph2 = graphviz.Source(dot_data)
 
-                # Function to display Graphviz tree in Streamlit
                 def st_graphviz2(graph, width, height):
                     try:
                         graphviz_svg = graph.pipe(format='svg').decode('utf-8', errors='replace')
                         graphviz_html = f"<div style='width:{width}px;height:{height}px'>{graphviz_svg}</div>"
-                        
                         st.components.v1.html(graphviz_html, width=width, height=height)
                         
                     except graphviz.backend.execute.ExecutableNotFound:
-                            st.error("""
-                                ⚠️ Graphviz is not working,
-                                Here are alternative ways:
-                                """)
-                            st.warning("使用 NetworkX + Matplotlib 替代方案")
-                            try:
-                                    import networkx as nx
-                                    import matplotlib.pyplot as plt
-                                    nx_graph = nx.drawing.nx_pydot.from_pydot(graph)
-        
-                                    plt.figure(figsize=(width/100, height/100))
-                                    nx.draw(nx_graph, with_labels=True, node_size=1000, node_color="skyblue")
-                                    st.pyplot(plt)
-                            except ImportError:
-                                    st.error("NetworkX is not available")
+                        st.error("""
+                        ⚠️ Graphviz executable not found! Please follow these steps:
+                        1. Ensure you have added `.streamlit/packages.txt` containing `graphviz`
+                        2. Re-deploy your application
+                        3. Here is the DOT source code for debugging:
+                        """)
+                        st.code(graph.source) 
 
+                        try:
+                        import pydot
+                        from PIL import Image
+                        
+                        pydot_graph = pydot.graph_from_dot_data(graph.source)[0]
+                    
+                        png_data = pydot_graph.create_png()
+                        img = Image.open(io.BytesIO(png_data))
+                        
+                        st.image(img, caption='Graph Visualization', width=width)
+                        
+                    except Exception as pydot_e:
+                        st.error(f"Pydot alternative failed: {str(pydot_e)}")
+
+                        try:
+                            import networkx as nx
+                            
+                            G = nx.DiGraph()
+                            
+                            G.add_node("Start")
+                            G.add_node("Decision")
+                            G.add_node("End")
+                            G.add_edge("Start", "Decision", label="Condition")
+                            G.add_edge("Decision", "End", label="Result")
+                            
+                            plt.figure(figsize=(width/100, height/100))
+                            pos = nx.spring_layout(G)
+                            nx.draw(G, pos, with_labels=True, node_size=3000, node_color="skyblue", font_size=10)
+                            edge_labels = nx.get_edge_attributes(G, 'label')
+                            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+                            st.pyplot(plt)
+                            
+                        except Exception as nx_e:
+                            st.error(f"NetworkX alternative failed: {str(nx_e)}")
+                            st.warning("Unable to visualize graph. Showing DOT source instead.")
+                            st.code(graph.source)  
+        
                     except Exception as e:
                         st.error(f"Graph cann't be generated: {str(e)}")
                         import traceback
                         st.code(traceback.format_exc())
+                        st.code(graph.source)
+                        
                 # Checkbox for user to select diagram size and scrolling
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
                 if show_big_tree:
