@@ -927,9 +927,9 @@ elif page == "Prediction 📣":
 
             if not st.session_state["mlflow_access"]:
                 if st.button("🚀 Go to MLFlow Experiment Record Page"):
-                    st.session_state["mlflow_password_verified"] = True
+                    st.session_state["show_password_input"] = True
                     
-                if st.session_state.get("smlflow_password_verified", False):
+                if st.session_state.get("show_password_input", False):
                     st.warning("⚠️ Are you sure you want to go to MLFlow page with PyCaret running records? This will be a different website page. ⏱️ If so, enter the Password: YES")
                     password = st.text_input("🔐 Enter Password to continue: ", type="password", key="mlflow_password")
     
