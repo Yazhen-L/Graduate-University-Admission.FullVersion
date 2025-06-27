@@ -54,32 +54,6 @@ import sklearn.metrics as metrics
 plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
-def setup_environment():
-        graphviz_paths = [
-            '/usr/bin/graphviz/bin',
-            '/usr/local/bin',
-            '/usr/bin',
-            str(Path.home() / 'graphviz' / 'bin')
-        ]
-        
-        for path in graphviz_paths:
-            if Path(path).exists():
-                os.environ["PATH"] += os.pathsep + path
-        
-        try:
-            import graphviz
-            st.sidebar.success(f"Graphviz Python 库: {graphviz.__version__}")
-            
-            result = subprocess.run(['dot', '-V'], capture_output=True, text=True)
-            if result.returncode == 0:
-                st.sidebar.success(f"Graphviz: {result.stdout.strip()}")
-            else:
-                st.sidebar.warning("Graphviz is not found.")
-                st.sidebar.code(result.stderr)
-        except ImportError:
-            st.sidebar.error("Python graphviz cann't be downloaded.")
-setup_environment()
-
 
 # Load the dataset
 df = pd.read_csv("Admission_Predict_Ver1.1.csv")
@@ -789,9 +763,26 @@ elif page == "Prediction 📣":
                         st.components.v1.html(graphviz_html, width=width, height=height)
                         
                     except graphviz.backend.execute.ExecutableNotFound:
-                        st.error("""
-                        ⚠️ Graphviz is not working
-                        """)
+                            st.error("""
+                                ⚠️ Graphviz is not working,
+                                Here are alternative ways:
+                                """)
+                            st.warning("使用 NetworkX + Matplotlib 替代方案")
+                            try:
+                                    import networkx as nx
+                                    import matplotlib.pyplot as plt
+                                    nx_graph = nx.drawing.nx_pydot.from_pydot(graph)
+        
+                                    plt.figure(figsize=(width/100, height/100))
+                                    nx.draw(nx_graph, with_labels=True, node_size=1000, node_color="skyblue")
+                                    st.pyplot(plt)
+                            except ImportError:
+                                    st.error("NetworkX is not available")
+
+                    except Exception as e:
+                        st.error(f"Graph cann't be generated: {str(e)}")
+                        import traceback
+                        st.code(traceback.format_exc())
                 # Checkbox for user to select diagram size and scrolling
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
                 if show_big_tree:
