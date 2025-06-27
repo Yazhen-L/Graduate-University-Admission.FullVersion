@@ -30,6 +30,7 @@ from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 import graphviz
 from sklearn.tree import export_graphviz
+import plotly.graph_objects as go
 import time
 import subprocess
 from pathlib import Path
@@ -777,71 +778,48 @@ elif page == "Prediction 📣":
                 graph = graphviz.Source(dot_data)
                 st.graphviz_chart(graph)
 
-                # Convert to a graph using Graphviz
-                #graph2 = graphviz.Source(dot_data)
-
-                def st_graphviz2(graph, width, height):
-                    try:
-                        graphviz_svg = graph.pipe(format='svg').decode('utf-8', errors='replace')
-                        graphviz_html = f"<div style='width:{width}px;height:{height}px'>{graphviz_svg}</div>"
-                        st.components.v1.html(graphviz_html, width=width, height=height)
-                        
-                    except graphviz.backend.execute.ExecutableNotFound:
-                        st.error("""
-                        ⚠️ Graphviz executable not found! Please follow these steps:
-                        1. Ensure you have added `.streamlit/packages.txt` containing `graphviz`
-                        2. Re-deploy your application
-                        3. Here is the DOT source code for debugging:
-                        """)
-                        st.code(graph.source) 
-
-                        try:
-                        import pydot
-                        from PIL import Image
-                        
-                        pydot_graph = pydot.graph_from_dot_data(graph.source)[0]
+                def plot_interactive_graph():
+                        # 创建节点和边
+                        nodes = ["Start", "Decision", "End"]
+                        edges = [("Start", "Decision"), ("Decision", "End")]
                     
-                        png_data = pydot_graph.create_png()
-                        img = Image.open(io.BytesIO(png_data))
-                        
-                        st.image(img, caption='Graph Visualization', width=width)
-                        
-                    except Exception as pydot_e:
-                        st.error(f"Pydot alternative failed: {str(pydot_e)}")
-
-                        try:
-                            import networkx as nx
+                            # 创建网络图
+                            fig = go.Figure(data=[
+                                go.Scatter(
+                                    x=[0, 1, 2], y=[0, 1, 0],  # 节点位置
+                                    mode="markers+text",
+                                    text=nodes,
+                                    marker=dict(size=50, color="lightblue"),
+                                    textfont=dict(size=20)
+                                ),
+                                go.Scatter(
+                                    x=[0, 1, 1, 2], y=[0, 1, 1, 0],  # 边位置
+                                    mode="lines",
+                                    line=dict(width=2, color="gray")
+                                )
+                            ])
                             
-                            G = nx.DiGraph()
+                            # 添加边标签
+                            fig.add_annotation(x=0.5, y=0.5, text="Condition", showarrow=False)
+                            fig.add_annotation(x=1.5, y=0.5, text="Result", showarrow=False)
                             
-                            G.add_node("Start")
-                            G.add_node("Decision")
-                            G.add_node("End")
-                            G.add_edge("Start", "Decision", label="Condition")
-                            G.add_edge("Decision", "End", label="Result")
+                            # 更新布局
+                            fig.update_layout(
+                                title="Interactive Decision Graph",
+                                showlegend=False,
+                                hovermode="closest",
+                                margin=dict(b=20, l=5, r=5, t=40),
+                                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                                height=600
+                            )
                             
-                            plt.figure(figsize=(width/100, height/100))
-                            pos = nx.spring_layout(G)
-                            nx.draw(G, pos, with_labels=True, node_size=3000, node_color="skyblue", font_size=10)
-                            edge_labels = nx.get_edge_attributes(G, 'label')
-                            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-                            st.pyplot(plt)
-                            
-                        except Exception as nx_e:
-                            st.error(f"NetworkX alternative failed: {str(nx_e)}")
-                            st.warning("Unable to visualize graph. Showing DOT source instead.")
-                            st.code(graph.source)  
-        
-                    except Exception as e:
-                        st.error(f"Graph cann't be generated: {str(e)}")
-                        import traceback
-                        st.code(traceback.format_exc())
-                        st.code(graph.source)
+                            st.plotly_chart(fig, use_container_width=True)
                         
                 # Checkbox for user to select diagram size and scrolling
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
                 if show_big_tree:
-                    st_graphviz2(graph2,1200, 800)
+                    plot_interactive_graph()
 
 
             # Display the metics and execution time
