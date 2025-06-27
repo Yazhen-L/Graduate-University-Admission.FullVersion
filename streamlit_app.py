@@ -972,9 +972,9 @@ elif page == "Prediction 📣":
                     st.error(f"Error configuring MLflow: {str(e)}")
 
                 if st.button("⬅️ Back to Main Page"):
-                st.session_state["mlflow_access"] = False
-                st.session_state["mlflow_password_verified"] = False
-                st.experimental_rerun()
+                    st.session_state["mlflow_access"] = False
+                    st.session_state["mlflow_password_verified"] = False
+                    st.experimental_rerun()
 
                 
 
