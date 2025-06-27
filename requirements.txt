@@ -1,7 +1,7 @@
 setuptools==70.0.0
 wheel==0.43.0
 
-streamlit
+streamlit==1.46.1
 streamlit-option-menu
 streamlit-extras
 streamlit-aggrid
