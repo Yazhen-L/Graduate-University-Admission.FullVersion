@@ -916,6 +916,12 @@ elif page == "Prediction 📣":
             
             st.write("### ⚡️ Compare Top 3 Regressors with PyCaret")
 
+            # Get the DASshub Token
+            os.environ["DAGSHUB_TOKEN"] = "4d1d9fa89a353908874d7a4675b349668f941c66"
+            os.environ["DAGSHUB_USERNAME"] = "Yazhen-L"
+            DAGSHUB_TOKEN = os.getenv("DAGSHUB_TOKEN", "4d1d9fa89a353908874d7a4675b349668f941c66")
+            TokenStorage().add_token(host="https://dagshub.com", token=DAGSHUB_TOKEN)
+
             # DAGsHub MLflow Integration
             dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True)
 
