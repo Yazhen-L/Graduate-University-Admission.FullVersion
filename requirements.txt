@@ -16,9 +16,10 @@ Pillow
 requests
 
 xgboost
+networkx==3.1
+pydot==1.4.2
 graphviz==0.20.1
-networkx==3.3
-pydot==2.0.0
+pygraphviz==1.12
 mlflow
 dagshub
 pycaret>=3.3.2
