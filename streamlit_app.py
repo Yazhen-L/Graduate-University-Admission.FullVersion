@@ -768,7 +768,7 @@ elif page == "Prediction 📣":
                                     max_depth=10
                                 )
                                 
-                                st.subheader("Decision Tree Rules")
+                                st.write("Decision Tree In Text But Clearer Details")
                                 with st.expander("View Tree Structure"):
                                     st.code(tree_rules)
                                 
