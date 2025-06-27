@@ -1211,8 +1211,10 @@ elif page == "MLFlow I Tracker 🚀":
         y = df["Chance of Admit"]
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 
-        st.warning("⚠️ Please be careful to select the number of models you want to run at the same time. Sometimes, the Streamlit platform works well.")
-        st.warning("⚠️ If not, please **decrease the number of selected models**, because the Streamlit platform has a running timeout. Thank you for your understanding!")
+        st.warning(
+            "Caution: Please be careful to select the number of models you want to run at the same time. Sometimes, the Streamlit platform works well.  \n"
+            "⚠️ If not, please **decrease the number of selected models**, because the Streamlit platform has a running timeout. Thank you for your understanding!"
+        )
         
         # Define model display names first
         model_names = [
