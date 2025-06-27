@@ -36,7 +36,6 @@ import mlflow
 import mlflow.sklearn
 import os
 import dagshub
-from dagshub.auth import TokenStorage
 from sklearn.model_selection import train_test_split
 from pycaret.regression import setup, compare_models
 
@@ -921,12 +920,11 @@ elif page == "Prediction 📣":
             os.environ["DAGSHUB_QUIET"] = "1"
             try:
                 DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
+                os.environ["DAGSHUB_TOKEN"] = st.secrets["DAGSHUB_TOKEN"]
             except KeyError:
                 st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
                 st.stop()
 
-            TokenStorage().add_token(host="https://dagshub.com", token=DAGSHUB_TOKEN)
-            
             # DAGsHub MLflow Integration
             dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True)
 
