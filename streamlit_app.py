@@ -37,6 +37,7 @@ import mlflow.sklearn
 import os
 import dagshub
 from sklearn.model_selection import train_test_split
+import threading
 from pycaret.regression import setup, compare_models
 
 
@@ -955,27 +956,6 @@ elif page == "Prediction 📣":
                         st.stop()
                     else:
                         st.success("Access Granted. Please wait ~3.5 min while PyCaret loads the top 3 models...")
-
-
-                        
-                        # Add progress bar before the long run
-                        progress = st.progress(0)
-                        status_text = st.empty()
-                
-                        # Simulate progress while PyCaret runs
-                        def run_pycaret_with_progress():
-                            # Start a background progress update
-                            for i in range(100):
-                                time.sleep(0.03)  # 3s total (we'll loop again below to stretch to 3.5 min)
-                                progress.progress(i + 1)
-                                status_text.text(f"Working... {i + 1}%")
-                
-                        # Start the progress bar in a thread (so it runs while PyCaret loads)
-                        import threading
-                        progress_thread = threading.Thread(target=run_pycaret_with_progress)
-                        progress_thread.start()
-
-
                         
                         with st.spinner("Training and logging top models... (this may take a few minutes)"):
                             # Initialize PyCaret setup with the training set
