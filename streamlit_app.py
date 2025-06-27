@@ -920,13 +920,22 @@ elif page == "Prediction 📣":
             os.environ["DAGSHUB_QUIET"] = "1"
             try:
                 DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
-                os.environ["DAGSHUB_TOKEN"] = st.secrets["DAGSHUB_TOKEN"]
+                repo_owner = "Yazhen-L"
+                repo_name = "First-Repo"
+                
+                tracking_uri = f"https://dagshub.com/Yazhen-L/First-Repo.mlflow"
+                mlflow.set_tracking_uri(tracking_uri)
+                
+                os.environ["MLFLOW_TRACKING_USERNAME"] = Yazhen-L
+                os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
+                
+                st.success(f"✅ MLflow already tracked: {tracking_uri}")
             except KeyError:
                 st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
                 st.stop()
 
             # DAGsHub MLflow Integration
-            dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True)
+            #dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True)
 
             if "pycaret_triggered" not in st.session_state:
                 st.session_state["pycaret_triggered"] = False
