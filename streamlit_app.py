@@ -922,6 +922,9 @@ elif page == "Prediction 📣":
 
             if "mlflow_password_verified" not in st.session_state:
                 st.session_state["mlflow_password_verified"] = False
+            
+            if "show_password_input" not in st.session_state:
+                st.session_state["show_password_input"] = False
 
             back_button = False
 
