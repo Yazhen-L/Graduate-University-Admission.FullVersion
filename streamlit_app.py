@@ -756,7 +756,7 @@ elif page == "Prediction 📣":
                 st.graphviz_chart(graph)
 
                 # Checkbox for user to select diagram size and scrolling
-                show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
+                show_big_tree = st.checkbox("Show a clearer Decision Tree Diagram in TEXT version", value=False)
                 if show_big_tree:
                     if "dt_model" in st.session_state and "feature_names" in st.session_state:
                         def display_decision_tree_text(model, feature_names):
