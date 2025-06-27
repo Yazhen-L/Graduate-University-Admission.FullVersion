@@ -973,7 +973,7 @@ elif page == "Prediction 📣":
                     repo_owner = "Yazhen-L"
                     repo_name = "First-Repo"
                     
-                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow/#/experiments/0"
+                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow/#/experiments/0?searchFilter=&orderByKey=attributes.start_time&orderByAsc=false&startTime=ALL&lifecycleFilter=Active&modelVersionFilter=All+Runs&datasetsFilter=W10%3D"
                     mlflow.set_tracking_uri(tracking_uri)
                     
                     os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
