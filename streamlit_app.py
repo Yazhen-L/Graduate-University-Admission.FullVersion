@@ -769,11 +769,11 @@ elif page == "Prediction 📣":
                                 )
                                 
                                 st.write("Decision Tree In Text But Clearer Details")
-                                with st.expander("View Tree Structure"):
+                                with st.expander("View Tree Structure in Text Version"):
                                     st.code(tree_rules)
                                 
                                 st.download_button(
-                                    label="Download Tree Rules",
+                                    label="Download Tree in Text Version",
                                     data=tree_rules,
                                     file_name="decision_tree_rules.txt",
                                     mime="text/plain"
