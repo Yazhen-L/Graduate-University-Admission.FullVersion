@@ -1293,7 +1293,7 @@ elif page == "MLFlow I Tracker 🚀":
             st.success("✅ All selected models have been trained and logged to MLflow!")
             st.success(f"🏆 Best prediction based on R² is **{best_model}**")
             about_text0 = """
-            ## Explain the Different Rankings in terms of Model Performances
+            #### Explain the Different Rankings in terms of Model Performances
             Feel free to review the Model Comparison Summary in **Prediction 📣 - 🦾 AutoML Exploration (PyCaret)**~
 
             Here, we have different model performance rankings mainly because we used different parameters for models, compared with PyCaret:
