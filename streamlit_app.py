@@ -921,11 +921,13 @@ elif page == "Prediction 📣":
             try:
                 DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
             except KeyError:
-                st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets")
+                st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
                 st.stop()
 
+            TokenStorage().add_token(host="https://dagshub.com", token=DAGSHUB_TOKEN)
+            
             # DAGsHub MLflow Integration
-            dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True, token=DAGSHUB_TOKEN)
+            dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True)
 
             if "pycaret_triggered" not in st.session_state:
                 st.session_state["pycaret_triggered"] = False
