@@ -31,6 +31,8 @@ from xgboost import XGBRegressor
 import graphviz
 from sklearn.tree import export_graphviz
 import time
+import subprocess
+from pathlib import Path
 
 import mlflow
 import mlflow.sklearn
@@ -51,6 +53,32 @@ import sklearn.metrics as metrics
 
 plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
+
+def setup_environment():
+        graphviz_paths = [
+            '/usr/bin/graphviz/bin',
+            '/usr/local/bin',
+            '/usr/bin',
+            str(Path.home() / 'graphviz' / 'bin')
+        ]
+        
+        for path in graphviz_paths:
+            if Path(path).exists():
+                os.environ["PATH"] += os.pathsep + path
+        
+        try:
+            import graphviz
+            st.sidebar.success(f"Graphviz Python 库: {graphviz.__version__}")
+            
+            result = subprocess.run(['dot', '-V'], capture_output=True, text=True)
+            if result.returncode == 0:
+                st.sidebar.success(f"Graphviz: {result.stdout.strip()}")
+            else:
+                st.sidebar.warning("Graphviz is not found.")
+                st.sidebar.code(result.stderr)
+        except ImportError:
+            st.sidebar.error("Python graphviz cann't be downloaded.")
+setup_environment()
 
 
 # Load the dataset
@@ -753,9 +781,17 @@ elif page == "Prediction 📣":
                 graph2 = graphviz.Source(dot_data)
 
                 # Function to display Graphviz tree in Streamlit
-                def st_graphviz2(graph, width= None, height=None):
-                    graphviz_html = f"<body>{graph.pipe(format='svg').decode('utf-8', errors='replace')}</body>"
-                    st.components.v1.html(graphviz_html,width = width , height=height, scrolling=True)
+                def st_graphviz2(graph, width, height):
+                    try:
+                        graphviz_svg = graph.pipe(format='svg').decode('utf-8', errors='replace')
+                        graphviz_html = f"<div style='width:{width}px;height:{height}px'>{graphviz_svg}</div>"
+                        
+                        st.components.v1.html(graphviz_html, width=width, height=height)
+                        
+                    except graphviz.backend.execute.ExecutableNotFound:
+                        st.error("""
+                        ⚠️ Graphviz is not working
+                        """)
                 # Checkbox for user to select diagram size and scrolling
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
                 if show_big_tree:
