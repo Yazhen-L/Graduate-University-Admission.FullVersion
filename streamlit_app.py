@@ -943,6 +943,7 @@ elif page == "Prediction 📣":
                         st.session_state["mlflow_password_verified"] = True
                         st.session_state["mlflow_access"] = True
                         st.success("✅ Password verified! Loading MLflow access...")
+                        st.session_state["show_password_input"] = False
                         st.rerun()
                             
             if st.session_state["mlflow_access"]:
@@ -971,7 +972,6 @@ elif page == "Prediction 📣":
             if back_button:
                 st.session_state["mlflow_access"] = False
                 st.session_state["mlflow_password_verified"] = False
-                st.session_state["show_password_input"] = False
                 st.rerun()
                     
                 
