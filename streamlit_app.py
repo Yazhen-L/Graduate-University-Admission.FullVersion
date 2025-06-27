@@ -1156,7 +1156,7 @@ elif page == "MLFlow I Tracker 🚀":
         # Set the title of the page in rainbow colors
         st.markdown(
             """
-            <h1 style='text-align: center; font-size: 3.0em; font-weight: bold'>🔍 MLFlow Model Tracker + Streamlit</h1>
+            <h1 style='text-align: center; font-size: 3.0em; font-weight: bold'>🔍 MLFlow Model Tracker </h1>
             <div style='height: 4px; 
                         margin: 0 auto 20px auto; 
                         width: 60%%; 
@@ -1168,7 +1168,22 @@ elif page == "MLFlow I Tracker 🚀":
         )
 
         # Initialize DagsHub MLflow tracking
-        dagshub.init(repo_owner='Christinachen017', repo_name='Finalproject', mlflow=True)
+        # dagshub.init(repo_owner='Christinachen017', repo_name='Finalproject', mlflow=True)
+        try:
+                    os.environ["DAGSHUB_QUIET"] = "1"
+                    DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
+                    repo_owner = "Christinachen017"
+                    repo_name = "Finalproject"
+                    
+                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+                    mlflow.set_tracking_uri(tracking_uri)
+                    
+                    os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
+                    os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
+        except KeyError:
+                    st.error("DAGSHUB_TOKEN has not been set up yet. Please check Streamlit Secrets.")
+        except Exception as e:
+            st.error(f"Error configuring MLflow: {str(e)}")
 
 
         df.columns = df.columns.str.strip()
@@ -1176,55 +1191,79 @@ elif page == "MLFlow I Tracker 🚀":
         y = df["Chance of Admit"]
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 
-        # choose input
-        number = st.slider(
-            label="Choose a number for model parameters between 0 and 100",
-            min_value=0,
-            max_value=100,
-            value=50,  # default value
-            step=1
+        # Define model display names first
+        model_names = [
+            "01 DecisionTree",
+            "02 LinearRegression",
+            "03 RandomForest",
+            "04 XGBoost"
+        ]
+
+        # Let user select models
+        selected_models = st.multiselect(
+            'Select models you are interested in:',
+            model_names
         )
-        with st.spinner('🔄 Loading MLFlow... Please wait a moment while we update the results for you. Thank you for your patience!'):
-            # Define models
-            models = {
-                "LinearRegression": LinearRegression(),
-                "DecisionTree": DecisionTreeRegressor(max_depth=number),
-                "RandomForest": RandomForestRegressor(n_estimators=100),
-                "XGBoost": xgb.XGBRegressor(n_estimators=100, learning_rate=0.1)
-            }
-
-
-            for i, (name, model) in enumerate(models.items(), 1):
-                with mlflow.start_run(run_name=f"Model_{i}_{name}"):
-                    st.subheader(f"📦 Training: {name}")
+        
+        # Show slider only if Decision Tree is selected
+        max_depth_value = None
+        if "01 DecisionTree" in selected_models:
+            max_depth_value = st.slider(
+                label="Choose max_depth for DecisionTree",
+                min_value=1,
+                max_value=100,
+                value=5,
+                step=1
+            )
+    
+        # Build models dict (only now)
+        models = {
+            "01 DecisionTree": DecisionTreeRegressor(max_depth=max_depth_value or 5),
+            "02 LinearRegression": LinearRegression(),
+            "03 RandomForest": RandomForestRegressor(n_estimators=100),
+            "04 XGBoost": xgb.XGBRegressor(n_estimators=100, learning_rate=0.1)
+        }
+        
+        r2_scores = {}
+        # Train and track selected models
+        with st.spinner("🔄 Loading MLFlow... Please wait a moment while we update the results for you. Thank you for your patience!"):
+            for model_name in selected_models:
+                model = models[model_name]
+                with mlflow.start_run(run_name=f"Model_{model_name}"):
+                    st.subheader(f"📦 Training: {model_name}")
                     model.fit(X_train, y_train)
                     y_pred = model.predict(X_test)
-
-                    # Log params
-                    params = model.get_params()
-                    for k, v in params.items():
+                    
+                    # Log parameters
+                    for k, v in model.get_params().items():
                         mlflow.log_param(k, v)
 
-                    # Evaluate + Log
+                    # Log metrics
                     mse = metrics.mean_squared_error(y_test, y_pred)
                     mae = metrics.mean_absolute_error(y_test, y_pred)
                     r2 = metrics.r2_score(y_test, y_pred)
                     mlflow.log_metric("mse", mse)
                     mlflow.log_metric("mae", mae)
                     mlflow.log_metric("r2", r2)
-
-                    # Display
-                    st.write(f"**MSE:** {mse:,.4f}")
-                    st.write(f"**MAE:** {mae:,.4f}")
+                    r2_scores[model_name] = r2
+                    
+                    # Display metrics
+                    st.write(f"**MSE:** {mse:.4f}")
+                    st.write(f"**MAE:** {mae:.4f}")
                     st.write(f"**R² Score:** {r2:.4f}")
-
+                    
+                    # Plot
                     fig, ax = plt.subplots()
                     ax.scatter(y_test, y_pred, alpha=0.5)
                     ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], "--r")
                     ax.set_xlabel("Actual")
                     ax.set_ylabel("Predicted")
-                    ax.set_title(f"{name} - Actual vs Predicted")
+                    ax.set_title(f"{model_name} - Actual vs Predicted")
                     st.pyplot(fig)
+        if r2_scores:
+            best_model = max(r2_scores, key=r2_scores.get)
+            st.success("✅ All selected models have been trained and logged to MLflow!")
+            st.success(f"🏆 Best prediction based on R² is **{best_model}**")
 
 
 elif page == "MLflow II Runs 📈":
