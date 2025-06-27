@@ -1233,7 +1233,7 @@ elif page == "MLFlow I Tracker 🚀":
         
         # Show slider only if Decision Tree is selected
         max_depth_value = None
-        if "01 DecisionTree" in selected_models:
+        if "04 DecisionTree" in selected_models:
             max_depth_value = st.slider(
                 label="Choose max_depth for DecisionTree",
                 min_value=1,
