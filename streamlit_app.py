@@ -930,23 +930,23 @@ elif page == "Prediction 📣":
                             st.stop()
                         else:
                             st.session_state["mlflow_access"] = True
-                    if st.session_state["mlflow_access"]: 
-                        os.environ["DAGSHUB_QUIET"] = "1"
-                        try:
-                            DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
-                            repo_owner = "Yazhen-L"
-                            repo_name = "First-Repo"
-                            
-                            tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
-                            mlflow.set_tracking_uri(tracking_uri)
-                            
-                            os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
-                            os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
-                            
-                            st.success(f"✅ MLflow already tracked, here is the Link: {tracking_uri}")
-                        except KeyError:
-                            st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
-                            st.stop()
+                            if st.session_state["mlflow_access"]: 
+                                os.environ["DAGSHUB_QUIET"] = "1"
+                                try:
+                                    DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
+                                    repo_owner = "Yazhen-L"
+                                    repo_name = "First-Repo"
+                                    
+                                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+                                    mlflow.set_tracking_uri(tracking_uri)
+                                    
+                                    os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
+                                    os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
+                                    
+                                    st.success(f"✅ MLflow already tracked, here is the Link: {tracking_uri}")
+                                except KeyError:
+                                    st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
+                                    st.stop()
 
 elif page == "Explainability 📝":
     # Loading Animation
