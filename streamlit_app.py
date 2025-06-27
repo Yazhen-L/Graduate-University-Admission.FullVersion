@@ -755,7 +755,6 @@ elif page == "Prediction 📣":
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
                 if show_big_tree:
                     def display_decision_tree_text(model, feature_names):
-                            """以文本形式显示决策树"""
                             from sklearn.tree import export_text
                             
                             tree_rules = export_text(
@@ -774,6 +773,9 @@ elif page == "Prediction 📣":
                                 file_name="decision_tree_rules.txt",
                                 mime="text/plain"
                             )
+                    display_decision_tree_text(st.session_state.dt_model, st.session_state.feature_names)
+                else:
+                    st.warning("Decision tree model not available. Please train the decision tree model first!")
 
             # Display the metics and execution time
             def update_metrics(model_name, mae , mse, r2, exec_time):
