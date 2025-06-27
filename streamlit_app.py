@@ -918,7 +918,7 @@ elif page == "Prediction 📣":
             st.write("### ⚡️ Closer Look with PyCaret Experiments on MLFlow")
 
             if "mlflow_access" not in st.session_state:
-            st.session_state["mlflow_access"] = False
+                st.session_state["mlflow_access"] = False
 
             if not st.session_state["mlflow_access"]:
                 if st.button("🚀 Go to MLFlow Experiment Record Page"):
