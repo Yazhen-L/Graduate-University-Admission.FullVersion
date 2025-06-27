@@ -930,8 +930,7 @@ elif page == "Prediction 📣":
                             st.stop()
                         else:
                             st.session_state["mlflow_access"] = True
-                            st.rerun()
-                    else:
+                    if st.session_state["mlflow_access"]: 
                         os.environ["DAGSHUB_QUIET"] = "1"
                         try:
                             DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
