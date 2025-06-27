@@ -953,7 +953,7 @@ elif page == "Prediction 📣":
                     st.session_state["show_password_input"] = True
 
             if st.session_state["show_password_input"]:
-                st.warning("⚠️ Are you sure you want to go to MLFlow page with PyCaret running records? This will be a different website page. ⏱️ If so, enter the Password: YES")
+                st.warning("⚠️ Are you sure you want to go to MLFlow page with PyCaret running records? This will be a different website page. 🗝️ If so, enter the Password: YES")
                 password = st.text_input("🔐 Enter Password to continue: ", type="password", key="mlflow_password")
 
                 if password:
