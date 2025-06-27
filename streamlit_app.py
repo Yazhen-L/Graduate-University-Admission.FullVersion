@@ -48,6 +48,9 @@ import mlflow.xgboost
 import xgboost as xgb
 import sklearn.metrics as metrics
 
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
+plt.rcParams['axes.unicode_minus'] = False
+
 
 # Load the dataset
 df = pd.read_csv("Admission_Predict_Ver1.1.csv")
