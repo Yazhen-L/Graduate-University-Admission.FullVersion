@@ -954,22 +954,14 @@ elif page == "Prediction 📣":
                     
                     st.success(f"✅ MLflow tracking configured successfully! Here is the Link:")
                     st.markdown(f"[Click here to access MLflow UI]({tracking_uri})", unsafe_allow_html=True)
-
-                    try:
-                        experiments = mlflow.search_experiments()
-                        if experiments:
-                            st.write("### Available Experiments:")
-                            for exp in experiments:
-                                st.write(f"- {exp.name} (ID: {exp.experiment_id})")
-                        else:
-                            st.info("No experiments found in MLflow tracking.")
-                    except Exception as e:
-                        st.warning(f"Could not retrieve experiments: {str(e)}")
                         
                 except KeyError:
                     st.error("DAGSHUB_TOKEN has not been set up yet. Please check Streamlit Secrets.")
                 except Exception as e:
                     st.error(f"Error configuring MLflow: {str(e)}")
+                    
+            st.session_state["mlflow_access"] = False
+            st.session_state["mlflow_password_verified"] = False
                     
                 
 
