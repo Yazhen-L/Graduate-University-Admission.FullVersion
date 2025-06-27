@@ -920,33 +920,63 @@ elif page == "Prediction 📣":
             if "mlflow_access" not in st.session_state:
                 st.session_state["mlflow_access"] = False
 
+            if "mlflow_password_verified" not in st.session_state:
+                st.session_state["mlflow_password_verified"] = False
+
             if not st.session_state["mlflow_access"]:
                 if st.button("🚀 Go to MLFlow Experiment Record Page"):
+                    st.session_state["show_password_input"] = True
+                    
+                if st.session_state.get("show_password_input", False):
                     st.warning("⚠️ Are you sure you want to go to MLFlow page with PyCaret running records? This will be a different website page. ⏱️ If so, enter the Password: YES")
-                    password = st.text_input("🔐 Enter Password to continue: ", type="password", key="pycaret_password")
+                    password = st.text_input("🔐 Enter Password to continue: ", type="password", key="mlflow_password")
+    
                     if password:
                         if password != "YES":
                             st.error('Incorrect Password!')
-                            st.stop()
                         else:
+                            st.session_state["mlflow_password_verified"] = True
                             st.session_state["mlflow_access"] = True
-                            if st.session_state["mlflow_access"]: 
-                                os.environ["DAGSHUB_QUIET"] = "1"
-                                try:
-                                    DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
-                                    repo_owner = "Yazhen-L"
-                                    repo_name = "First-Repo"
-                                    
-                                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
-                                    mlflow.set_tracking_uri(tracking_uri)
-                                    
-                                    os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
-                                    os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
-                                    
-                                    st.success(f"✅ MLflow already tracked, here is the Link: {tracking_uri}")
-                                except KeyError:
-                                    st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
-                                    st.stop()
+                            st.success("✅ Password verified! Loading MLflow access...")
+                            
+            if st.session_state["mlflow_access"]:
+                try:
+                    os.environ["DAGSHUB_QUIET"] = "1"
+                    DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
+                    repo_owner = "Yazhen-L"
+                    repo_name = "First-Repo"
+                    
+                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+                    mlflow.set_tracking_uri(tracking_uri)
+                    
+                    os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
+                    os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
+                    
+                    st.success(f"✅ MLflow tracking configured successfully!")
+                    st.markdown(f"[Click here to access MLflow UI]({tracking_uri})", unsafe_allow_html=True)
+                    
+                    try:
+                        experiments = mlflow.search_experiments()
+                        if experiments:
+                            st.write("### Available Experiments:")
+                            for exp in experiments:
+                                st.write(f"- {exp.name} (ID: {exp.experiment_id})")
+                        else:
+                            st.info("No experiments found in MLflow tracking.")
+                    except Exception as e:
+                        st.warning(f"Could not retrieve experiments: {str(e)}")
+                        
+                except KeyError:
+                    st.error("DAGSHUB_TOKEN has not been set up yet. Please check Streamlit Secrets.")
+                except Exception as e:
+                    st.error(f"Error configuring MLflow: {str(e)}")
+
+                if st.button("⬅️ Back to Main Page"):
+                st.session_state["mlflow_access"] = False
+                st.session_state["mlflow_password_verified"] = False
+                st.experimental_rerun()
+
+                
 
 elif page == "Explainability 📝":
     # Loading Animation
