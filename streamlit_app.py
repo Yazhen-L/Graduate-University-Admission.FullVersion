@@ -1219,10 +1219,10 @@ elif page == "MLFlow I Tracker 🚀":
         
         # Define model display names first
         model_names = [
-            "01 XGBoost",
-            "02 DecisionTree",
+            "01 RandomForest",
+            "02 XGBoost",
             "03 LinearRegression",
-            "04 RandomForest",
+            "04 DecisionTree",
         ]
     
         # Let user select models & Provide Warning Sign
