@@ -2,7 +2,7 @@ setuptools==70.0.0
 wheel==0.43.0
 
 streamlit==1.46.1
-pandas>=2.2.2
+pandas==2.1.4
 numpy==1.26.4
 streamlit-option-menu
 streamlit-extras
