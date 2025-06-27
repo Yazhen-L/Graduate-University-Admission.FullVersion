@@ -1212,16 +1212,17 @@ elif page == "MLFlow I Tracker 🚀":
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 
         st.warning(
-            "Caution: Please be careful to select the number of models you want to run at the same time. Sometimes, the Streamlit platform works well.  \n"
-            "⚠️ If not, please **decrease the number of selected models**, because the Streamlit platform has a running timeout. Thank you for your understanding!"
+            "⚠️ Caution: Please be careful to select the number of models you want to run at the same time.  \n "
+            "⏱️ The total execution time for training all four models is around 3 min. Sometimes, the Streamlit platform works well.  \n"
+            "🚨 If not, please **decrease the number of selected models**, because the Streamlit platform has a running timeout. Thank you for your understanding!"
         )
         
         # Define model display names first
         model_names = [
-            "01 DecisionTree",
-            "02 LinearRegression",
-            "03 RandomForest",
-            "04 XGBoost"
+            "01 XGBoost",
+            "02 DecisionTree"
+            "03 LinearRegression",
+            "04 RandomForest",
         ]
     
         # Let user select models & Provide Warning Sign
@@ -1243,10 +1244,10 @@ elif page == "MLFlow I Tracker 🚀":
     
         # Build models dict (only now)
         models = {
-            "01 DecisionTree": DecisionTreeRegressor(max_depth=max_depth_value or 5),
-            "02 LinearRegression": LinearRegression(),
-            "03 RandomForest": RandomForestRegressor(n_estimators=100),
-            "04 XGBoost": xgb.XGBRegressor(n_estimators=100, learning_rate=0.1)
+            "01 RandomForest": RandomForestRegressor(n_estimators=100),
+            "02 XGBoost": xgb.XGBRegressor(n_estimators=100, learning_rate=0.1),
+            "03 LinearRegression": LinearRegression(),
+            "04 DecisionTree": DecisionTreeRegressor(max_depth=max_depth_value or 5)
         }
         
         r2_scores = {}
@@ -1289,6 +1290,21 @@ elif page == "MLFlow I Tracker 🚀":
             best_model = max(r2_scores, key=r2_scores.get)
             st.success("✅ All selected models have been trained and logged to MLflow!")
             st.success(f"🏆 Best prediction based on R² is **{best_model}**")
+            about_text0 = """
+            ## Explain the Different Rankings in terms of Model Performances
+            Feel free to review the Model Comparison Summary in **Prediction 📣 - 🦾 AutoML Exploration (PyCaret)**~
+
+            Here, we have different model performance rankings mainly because we used different parameters for models, compared with PyCaret:
+            - **RandomForest**: We used 100 n_estimators as a fixed parameter and no max_depth limit as a default parameter.
+            - **XGBoost**: We used 100 n_estimators as a fixed parameter and 0.10 learning_rate as a fixed parameter.
+            - P.S. LinearRegression*: No parameters needed.
+            - P.S. DecisionTree: We used user-input max_depth and 5 as a default value.
+            
+            PyCaret may use different parameters for these models, leading to these different rankings!
+            
+            👀 If you want to explore more about the above parameters influencing model performances, please go to **Prediction 📣 - 💪 Manual Explorations & Customized Predictions**! Have Fun 🥳
+            """
+            st.expander("🤔 Curious about the different rankings here and from PyCaret?").markdown(about_text0)
 
 
 elif page == "MLflow II Runs 📈":
