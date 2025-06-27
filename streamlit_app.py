@@ -973,7 +973,7 @@ elif page == "Prediction 📣":
                     repo_owner = "Yazhen-L"
                     repo_name = "First-Repo"
                     
-                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow/#/experiments/0"
                     mlflow.set_tracking_uri(tracking_uri)
                     
                     os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
@@ -1230,17 +1230,8 @@ elif page == "MLFlow I Tracker 🚀":
             'Select models you are interested in:',
             model_names
         )
-        
-        # Show slider only if Decision Tree is selected
+
         max_depth_value = None
-        if "04 DecisionTree" in selected_models:
-            max_depth_value = st.slider(
-                label="Choose max_depth for DecisionTree",
-                min_value=1,
-                max_value=100,
-                value=5,
-                step=1
-            )
     
         # Build models dict (only now)
         models = {
@@ -1255,6 +1246,15 @@ elif page == "MLFlow I Tracker 🚀":
         with st.spinner("🔄 Loading MLFlow... Please wait a moment while we update the results for you. Thank you for your patience!"):
             for model_name in selected_models:
                 model = models[model_name]
+                # Show slider only if Decision Tree is selected
+                if "04 DecisionTree" in selected_models:
+                    max_depth_value = st.slider(
+                        label="Choose max_depth for DecisionTree",
+                        min_value=1,
+                        max_value=100,
+                        value=5,
+                        step=1
+                    )
                 with mlflow.start_run(run_name=f"Model_{model_name}"):
                     st.subheader(f"📦 Training: {model_name}")
                     model.fit(X_train, y_train)
@@ -1286,6 +1286,7 @@ elif page == "MLFlow I Tracker 🚀":
                     ax.set_ylabel("Predicted")
                     ax.set_title(f"{model_name} - Actual vs Predicted")
                     st.pyplot(fig)
+
         if r2_scores:
             best_model = max(r2_scores, key=r2_scores.get)
             st.success("✅ All selected models have been trained and logged to MLflow!")
