@@ -1286,6 +1286,7 @@ elif page == "MLFlow I Tracker 🚀":
                     ax.set_ylabel("Predicted")
                     ax.set_title(f"{model_name} - Actual vs Predicted")
                     st.pyplot(fig)
+                mlflow.end_run()
 
         if r2_scores:
             best_model = max(r2_scores, key=r2_scores.get)
