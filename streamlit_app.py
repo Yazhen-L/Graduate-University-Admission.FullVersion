@@ -923,10 +923,10 @@ elif page == "Prediction 📣":
                 repo_owner = "Yazhen-L"
                 repo_name = "First-Repo"
                 
-                tracking_uri = f"https://dagshub.com/Yazhen-L/First-Repo.mlflow"
+                tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
                 mlflow.set_tracking_uri(tracking_uri)
                 
-                os.environ["MLFLOW_TRACKING_USERNAME"] = Yazhen-L
+                os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
                 os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
                 
                 st.success(f"✅ MLflow already tracked: {tracking_uri}")
