@@ -735,6 +735,10 @@ elif page == "Prediction 📣":
                     DecisionTreeRegressor(max_depth=params.get('max_depth', 5), random_state=42),
                     X_train, X_test, y_train, y_test
                 )
+                
+                st.session_state.dt_model = decision_tree_model
+                st.session_state.feature_names = X.columns.tolist()  # 存储特征名称
+    
                 # Export the tree in Graphviz format
                 feature_names = X.columns
                 feature_cols = X.columns
@@ -754,26 +758,29 @@ elif page == "Prediction 📣":
                 # Checkbox for user to select diagram size and scrolling
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
                 if show_big_tree:
-                    def display_decision_tree_text(model, feature_names):
-                            from sklearn.tree import export_text
-                            
-                            tree_rules = export_text(
-                                model, 
-                                feature_names=feature_names,
-                                max_depth=10
-                            )
-                            
-                            st.subheader("Decision Tree Rules")
-                            with st.expander("View Tree Structure"):
-                                st.code(tree_rules)
-                            
-                            st.download_button(
-                                label="Download Tree Rules",
-                                data=tree_rules,
-                                file_name="decision_tree_rules.txt",
-                                mime="text/plain"
-                            )
-                    display_decision_tree_text(st.session_state.dt_model, st.session_state.feature_names)
+                    if "dt_model" in st.session_state and "feature_names" in st.session_state:
+                        def display_decision_tree_text(model, feature_names):
+                                from sklearn.tree import export_text
+                                
+                                tree_rules = export_text(
+                                    model, 
+                                    feature_names=feature_names,
+                                    max_depth=10
+                                )
+                                
+                                st.subheader("Decision Tree Rules")
+                                with st.expander("View Tree Structure"):
+                                    st.code(tree_rules)
+                                
+                                st.download_button(
+                                    label="Download Tree Rules",
+                                    data=tree_rules,
+                                    file_name="decision_tree_rules.txt",
+                                    mime="text/plain"
+                                )
+                        display_decision_tree_text(st.session_state.dt_model, st.session_state.feature_names)
+                    else:
+                        st.warning("⚠️ Decision tree model not available. Please train the model first.")
 
             # Display the metics and execution time
             def update_metrics(model_name, mae , mse, r2, exec_time):
