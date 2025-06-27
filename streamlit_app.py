@@ -783,8 +783,8 @@ elif page == "Prediction 📣":
                         nodes = ["Start", "Decision", "End"]
                         edges = [("Start", "Decision"), ("Decision", "End")]
                     
-                            # 创建网络图
-                            fig = go.Figure(data=[
+                        # 创建网络图
+                        fig = go.Figure(data=[
                                 go.Scatter(
                                     x=[0, 1, 2], y=[0, 1, 0],  # 节点位置
                                     mode="markers+text",
@@ -797,14 +797,14 @@ elif page == "Prediction 📣":
                                     mode="lines",
                                     line=dict(width=2, color="gray")
                                 )
-                            ])
+                        ])
                             
-                            # 添加边标签
-                            fig.add_annotation(x=0.5, y=0.5, text="Condition", showarrow=False)
-                            fig.add_annotation(x=1.5, y=0.5, text="Result", showarrow=False)
+                        # 添加边标签
+                        fig.add_annotation(x=0.5, y=0.5, text="Condition", showarrow=False)
+                        fig.add_annotation(x=1.5, y=0.5, text="Result", showarrow=False)
                             
-                            # 更新布局
-                            fig.update_layout(
+                        # 更新布局
+                        fig.update_layout(
                                 title="Interactive Decision Graph",
                                 showlegend=False,
                                 hovermode="closest",
@@ -812,9 +812,9 @@ elif page == "Prediction 📣":
                                 xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                                 yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                                 height=600
-                            )
+                        )
                             
-                            st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width=True)
                         
                 # Checkbox for user to select diagram size and scrolling
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
