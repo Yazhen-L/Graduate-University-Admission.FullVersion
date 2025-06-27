@@ -920,8 +920,7 @@ elif page == "Prediction 📣":
             if "mlflow_access" not in st.session_state:
                 st.session_state["mlflow_access"] = False
 
-            if "mlflow_password_verified" not in st.session_state:
-                st.session_state["mlflow_password_verified"] = False
+            back_button = False
 
             if not st.session_state["mlflow_access"]:
                 if st.button("🚀 Go to MLFlow Experiment Record Page"):
@@ -938,6 +937,7 @@ elif page == "Prediction 📣":
                             st.session_state["mlflow_password_verified"] = True
                             st.session_state["mlflow_access"] = True
                             st.success("✅ Password verified! Loading MLflow access...")
+                            st.rerun()
                             
             if st.session_state["mlflow_access"]:
                 try:
@@ -959,11 +959,13 @@ elif page == "Prediction 📣":
                     st.error("DAGSHUB_TOKEN has not been set up yet. Please check Streamlit Secrets.")
                 except Exception as e:
                     st.error(f"Error configuring MLflow: {str(e)}")
+
+                back_button = st.button("⬅️ Back to Original Status")
                     
-                if st.button("⬅️ Back to Original Status"):
-                    st.session_state["mlflow_access"] = False
-                    st.session_state["mlflow_password_verified"] = False
-                    st.rerun()
+            if back_button:
+                st.session_state["mlflow_access"] = False
+                st.session_state["mlflow_password_verified"] = False
+                st.rerun()
                     
                 
 
