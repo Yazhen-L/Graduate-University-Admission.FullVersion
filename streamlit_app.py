@@ -30,7 +30,6 @@ from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 import graphviz
 from sklearn.tree import export_graphviz
-import plotly.graph_objects as go
 import time
 import subprocess
 from pathlib import Path
@@ -778,49 +777,29 @@ elif page == "Prediction 📣":
                 graph = graphviz.Source(dot_data)
                 st.graphviz_chart(graph)
 
-                def plot_interactive_graph():
-                        # 创建节点和边
-                        nodes = ["Start", "Decision", "End"]
-                        edges = [("Start", "Decision"), ("Decision", "End")]
-                    
-                        # 创建网络图
-                        fig = go.Figure(data=[
-                                go.Scatter(
-                                    x=[0, 1, 2], y=[0, 1, 0],  # 节点位置
-                                    mode="markers+text",
-                                    text=nodes,
-                                    marker=dict(size=50, color="lightblue"),
-                                    textfont=dict(size=20)
-                                ),
-                                go.Scatter(
-                                    x=[0, 1, 1, 2], y=[0, 1, 1, 0],  # 边位置
-                                    mode="lines",
-                                    line=dict(width=2, color="gray")
-                                )
-                        ])
-                            
-                        # 添加边标签
-                        fig.add_annotation(x=0.5, y=0.5, text="Condition", showarrow=False)
-                        fig.add_annotation(x=1.5, y=0.5, text="Result", showarrow=False)
-                            
-                        # 更新布局
-                        fig.update_layout(
-                                title="Interactive Decision Graph",
-                                showlegend=False,
-                                hovermode="closest",
-                                margin=dict(b=20, l=5, r=5, t=40),
-                                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                                height=600
-                        )
-                            
-                        st.plotly_chart(fig, use_container_width=True)
-                        
                 # Checkbox for user to select diagram size and scrolling
                 show_big_tree = st.checkbox("Show a larger and scrollable Decision Tree Diagram", value=False)
                 if show_big_tree:
-                    plot_interactive_graph()
-
+                    def display_decision_tree_text(model, feature_names):
+                            """以文本形式显示决策树"""
+                            from sklearn.tree import export_text
+                            
+                            tree_rules = export_text(
+                                model, 
+                                feature_names=feature_names,
+                                max_depth=10
+                            )
+                            
+                            st.subheader("Decision Tree Rules")
+                            with st.expander("View Tree Structure"):
+                                st.code(tree_rules)
+                            
+                            st.download_button(
+                                label="Download Tree Rules",
+                                data=tree_rules,
+                                file_name="decision_tree_rules.txt",
+                                mime="text/plain"
+                            )
 
             # Display the metics and execution time
             def update_metrics(model_name, mae , mse, r2, exec_time):
