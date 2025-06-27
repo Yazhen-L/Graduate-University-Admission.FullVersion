@@ -938,35 +938,30 @@ elif page == "Prediction 📣":
             # DAGsHub MLflow Integration
             #dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True)
 
-            if "pycaret_triggered" not in st.session_state:
-                st.session_state["pycaret_triggered"] = False
-
-            # Split data into training and testing sets
-            admission_train, admission_test = train_test_split(df, test_size=0.2, random_state=42)
-            # Load the top 3 models from session state if they exist
-            if st.button("🚀 Run Comparison & Log Top 3"):
-                st.session_state["pycaret_triggered"] = True
-
-            if st.session_state["pycaret_triggered"]:
-                st.warning("⚠️ Are you sure you want to re-train the model with PyCaret? This will spend around 3.5 min to load the top 3 models. ⏱️ If so, enter the Password: WAIT3.5min")
-                password = st.text_input("🔐 Enter Password to continue: ", type="password", key="pycaret_password")
-                if password:
-                    if password != "WAIT3.5min":
-                        st.error('Incorrect Password!')
-                        st.stop()
-                    else:
-                        st.success("Access Granted. Please wait ~3.5 min while PyCaret loads the top 3 models...")
+            def run_pycaret_comparison():
+                try:
+                    st.session_state.pycaret_status = "processing"
+                    
+                    reg1 = setup(
+                        data=admission_train, 
+                        target='Chance of Admit ', 
+                        session_id=42, 
+                        verbose=False
+                    )
+                    
+                    total_steps = 83
+                    for step in range(total_steps):
+                        st.session_state.pycaret_progress = (step + 1) / total_steps
                         
-                        with st.spinner("Training and logging top models... (this may take a few minutes)"):
-                            # Initialize PyCaret setup with the training set
-                            reg1 = setup(data= admission_train, target='Chance of Admit ', session_id=42, verbose=False)
-                            top3_models = compare_models(n_select=3)
+                        time.sleep(2.5) 
+                        
+                        if step % 10 == 0:
+                            st.session_state.pycaret_step = step
+                            
+                    top3_models = compare_models(n_select=3)
+                    st.session_state.top3_models = top3_models
 
-                            # Save models in session_state for use in tab2
-                            st.session_state["top3_models"] = top3_models
-
-                            st.write("### 🏅 Top 3 Models (Before Tuning):")
-                            for i, model in enumerate(top3_models, 1):
+                    for i, model in enumerate(top3_models, 1):
                                 with mlflow.start_run(run_name=f"Top Model {i}: {model.__class__.__name__}"):
                                     model_name = f"admission_model_{i}"
 
@@ -997,6 +992,69 @@ elif page == "Prediction 📣":
                                     dagshub_mlflow_url = "https://dagshub.com/Yazhen-L/First-Repo.mlflow" 
                                     st.markdown(f"[Go to MLflow UI on DAGsHub](https://dagshub.com/Yazhen-L/First-Repo.mlflow)") 
                                 mlflow.end_run()
+                    st.session_state.pycaret_status = "completed"
+                    st.session_state.pycaret_message = "✅ Models Training is done!"
+                
+                except Exception as e:
+                    # 处理错误
+                    st.session_state.pycaret_status = "error"
+                    st.session_state.pycaret_message = f"❌ Error: {str(e)}"
+            
+            if "pycaret_triggered" not in st.session_state:
+                st.session_state["pycaret_triggered"] = False
+            
+            # Split data into training and testing sets
+            admission_train, admission_test = train_test_split(df, test_size=0.2, random_state=42)
+            # Load the top 3 models from session state if they exist
+            if st.button("🚀 Run Comparison & Log Top 3"):
+                st.session_state["pycaret_triggered"] = True
+            
+            if st.session_state["pycaret_triggered"]:
+                if "pycaret_status" not in st.session_state:
+                    st.session_state.pycaret_status = "idle"
+                    st.session_state.pycaret_progress = 0.0
+                    st.session_state.pycaret_message = ""
+                st.warning("⚠️ Are you sure you want to re-train the model with PyCaret? This will spend around 3.5 min to load the top 3 models. ⏱️ If so, enter the Password: WAIT3.5min")
+                password = st.text_input("🔐 Enter Password to continue: ", type="password", key="pycaret_password")
+                if password:
+                    if password != "WAIT3.5min":
+                        st.error('Incorrect Password!')
+                        st.stop()
+                    else:
+                        st.success("Access Granted. Please wait ~3.5 min while PyCaret loads the top 3 models...")
+
+                        if st.session_state.pycaret_status == "idle":
+                            st.success("Access Granted. Starting PyCaret comparison...")
+                            thread = threading.Thread(target=run_pycaret_comparison, daemon=True)
+                            thread.start()
+                            st.session_state.pycaret_status = "starting"
+                        
+                        if st.session_state.pycaret_status in ["starting", "processing"]:
+                            progress_bar = st.progress(st.session_state.pycaret_progress)
+                            
+                            if st.session_state.pycaret_status == "starting":
+                                st.info("🚀 Loading PyCaret Comparison Task...")
+                            else:
+                                st.info(f"🔄 In Progress: {int(st.session_state.pycaret_progress * 100)}% 完成")
+                            
+                            if st.button("🔄 Refresh"):
+                                st.experimental_rerun()
+                            
+                            time.sleep(15)
+                            st.experimental_rerun()
+                        elif st.session_state.pycaret_status == "completed":
+                            st.success(st.session_state.pycaret_message)
+                        
+                            st.write("### 🏅 Top 3 Models (Before Tuning):")
+                            for i, model in enumerate(st.session_state.top3_models, 1):
+                                st.write(f"**Model {i}: {model.__class__.__name__}**")
+                                st.write(f"Mean Absolute Error (MAE):  {mae:.4f} | Mean Squared Error (MSE):  {mse:.4f} | R-squared (R²):  {r2:.4f}")
+                                dagshub_mlflow_url = "https://dagshub.com/Yazhen-L/First-Repo.mlflow" 
+                                st.markdown(f"[Go to MLflow UI on DAGsHub](https://dagshub.com/Yazhen-L/First-Repo.mlflow)") 
+
+                        elif st.session_state.pycaret_status == "error":
+                            st.error(st.session_state.pycaret_message)
+                            st.error("Task failed, please directly check MLFlow Record by the provided link!")
 
 
 
