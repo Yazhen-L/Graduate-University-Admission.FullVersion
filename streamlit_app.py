@@ -34,6 +34,7 @@ import time
 
 import mlflow
 import mlflow.sklearn
+import os
 import dagshub
 from sklearn.model_selection import train_test_split
 from pycaret.regression import setup, compare_models
@@ -916,7 +917,6 @@ elif page == "Prediction 📣":
             
             st.write("### ⚡️ Compare Top 3 Regressors with PyCaret")
 
-            import os
             os.environ["DAGSHUB_QUIET"] = "1"
             try:
                 DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
