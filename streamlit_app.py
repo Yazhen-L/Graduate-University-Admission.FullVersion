@@ -37,7 +37,6 @@ import mlflow.sklearn
 import os
 import dagshub
 from sklearn.model_selection import train_test_split
-import threading
 from pycaret.regression import setup, compare_models
 
 
@@ -916,143 +915,31 @@ elif page == "Prediction 📣":
             except FileNotFoundError:
                 st.error("PyCaret results file not found.")
             
-            st.write("### ⚡️ Compare Top 3 Regressors with PyCaret")
-
-            os.environ["DAGSHUB_QUIET"] = "1"
-            try:
-                DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
-                repo_owner = "Yazhen-L"
-                repo_name = "First-Repo"
-                
-                tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
-                mlflow.set_tracking_uri(tracking_uri)
-                
-                os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
-                os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
-                
-                st.success(f"✅ MLflow already tracked: {tracking_uri}")
-            except KeyError:
-                st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
-                st.stop()
-
-            # DAGsHub MLflow Integration
-            #dagshub.init(repo_owner='Yazhen-L', repo_name='First-Repo', mlflow=True)
-
-            def run_pycaret_comparison():
-                try:
-                    st.session_state.pycaret_status = "processing"
-                    
-                    reg1 = setup(
-                        data=admission_train, 
-                        target='Chance of Admit ', 
-                        session_id=42, 
-                        verbose=False
-                    )
-                    
-                    total_steps = 83
-                    for step in range(total_steps):
-                        st.session_state.pycaret_progress = (step + 1) / total_steps
-                        st.session_state.pycaret_step = step + 1
-                        
-                        #time.sleep(2.5) 
-                            
-                    top3_models = compare_models(n_select=3)
-                    st.session_state.top3_models = top3_models
-
-                    for i, model in enumerate(top3_models, 1):                
-                        with mlflow.start_run(run_name=f"Top Model {i}: {model.__class__.__name__}"):
-                            model_name = f"admission_model_{i}"
-
-                            # Log model
-                            #mlflow.sklearn.log_model(model, model_name)
-
-                            # Log parameters
-                            params = model.get_params()
-                            for key, value in params.items():
-                                mlflow.log_param(key, value)
-                            
-                            y_test = admission_test["Chance of Admit "]
-                            X_test = admission_test.drop("Chance of Admit ", axis=1)
-                            y_pred = model.predict(X_test)
-
-                            mae = mean_absolute_error(y_test, y_pred)
-                            mse = mean_squared_error(y_test, y_pred)
-                            r2 = r2_score(y_test, y_pred)
-
-                            mlflow.log_metric("mean_absolute_error", mae)
-                            mlflow.log_metric("mean_squared_error", mse)
-                            mlflow.log_metric("r_squared_score", r2)
-
-                            #mlflow.sklearn.log_model(model, f"top_model_{i}")
-                        mlflow.end_run()
-                        
-                    st.session_state.pycaret_status = "completed"
-                    st.session_state.pycaret_message = "✅ Models Training is done!"
-                
-                except Exception as e:
-                    # 处理错误
-                    st.session_state.pycaret_status = "error"
-                    st.session_state.pycaret_message = f"❌ Error: {str(e)}"
-
-            
-            if "pycaret_triggered" not in st.session_state:
-                st.session_state["pycaret_triggered"] = False
-            
-            # Split data into training and testing sets
-            admission_train, admission_test = train_test_split(df, test_size=0.2, random_state=42)
-            # Load the top 3 models from session state if they exist
-            if st.button("🚀 Run Comparison & Log Top 3"):
-                st.session_state["pycaret_triggered"] = True
-
-            
-            if st.session_state["pycaret_triggered"]:
-                if "pycaret_status" not in st.session_state:
-                    st.session_state.pycaret_status = "idle"
-                    st.session_state.pycaret_progress = 0.0
-                    st.session_state.pycaret_message = ""
-                st.warning("⚠️ Are you sure you want to re-train the model with PyCaret? This will spend around 3.5 min to load the top 3 models. ⏱️ If so, enter the Password: WAIT3.5min")
+            st.write("### ⚡️ Closer Look with PyCaret Experiments on MLFlow")
+            if st.button("🚀 Go to MLFlow Experiment Record Page"):
+                st.warning("⚠️ Are you sure you want to go to MLFlow page with PyCaret running records? This will be a different website page. ⏱️ If so, enter the Password: YES")
                 password = st.text_input("🔐 Enter Password to continue: ", type="password", key="pycaret_password")
                 if password:
-                    if password != "WAIT3.5min":
+                    if password != "YES":
                         st.error('Incorrect Password!')
                         st.stop()
                     else:
-                        if st.session_state.pycaret_status == "idle":
-                            st.success("Access Granted. Please wait ~3.5 min while PyCaret loads the top 3 models...")
-                            thread = threading.Thread(target=run_pycaret_comparison, daemon=True)
-                            thread.start()
-                            st.session_state.pycaret_status = "starting"
-                        
-                        if st.session_state.pycaret_status in ["starting", "processing"]:
-                            progress_bar = st.progress(st.session_state.pycaret_progress)
+                        os.environ["DAGSHUB_QUIET"] = "1"
+                        try:
+                            DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
+                            repo_owner = "Yazhen-L"
+                            repo_name = "First-Repo"
                             
-                            if st.session_state.pycaret_status == "starting":
-                                st.info("🚀 Loading PyCaret Comparison Task...")
-                            else:
-                                st.info(f"🔄 In Progress: {st.session_state.pycaret_step}/83 Finished ({int(st.session_state.pycaret_progress * 100)}%)")
+                            tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+                            mlflow.set_tracking_uri(tracking_uri)
                             
-                            refresh_placeholder = st.empty()
-                            refresh_placeholder.text("Auto Refreshing...")
+                            os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
+                            os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
                             
-                            time.sleep(5)
-                            refresh_placeholder.empty()
-                            st.experimental_memo.clear()
-                            
-                        elif st.session_state.pycaret_status == "completed":
-                            st.success(st.session_state.pycaret_message)
-                        
-                            st.write("### 🏅 Top 3 Models (Before Tuning):")
-                            for i, model in enumerate(st.session_state.top3_models, 1):
-                                st.write(f"**Model {i}: {model.__class__.__name__}**")
-                                st.write(f"Mean Absolute Error (MAE):  {mae:.4f} | Mean Squared Error (MSE):  {mse:.4f} | R-squared (R²):  {r2:.4f}")
-                                dagshub_mlflow_url = "https://dagshub.com/Yazhen-L/First-Repo.mlflow" 
-                                st.markdown(f"[Go to MLflow UI on DAGsHub](https://dagshub.com/Yazhen-L/First-Repo.mlflow)") 
-
-                        elif st.session_state.pycaret_status == "error":
-                            st.error(st.session_state.pycaret_message)
-                            st.error("Task failed, please directly check MLFlow Record by the provided link!")
-
-
+                            st.success(f"✅ MLflow already tracked, here is the Link: {tracking_uri}")
+                        except KeyError:
+                            st.error("DAGSHUB_TOKEN has not been set up yet，please check Streamlit Secrets.")
+                            st.stop()
 
 elif page == "Explainability 📝":
     # Loading Animation
