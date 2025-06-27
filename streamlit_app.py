@@ -980,7 +980,7 @@ elif page == "Prediction 📣":
                     os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
                     
                     st.success(f"✅ MLflow tracking configured successfully! Here is the Link:")
-                    st.markdown(f"[Click here to access MLflow UI]({tracking_uri})", unsafe_allow_html=True)
+                    st.markdown("[Click here to access MLflow Record](https://dagshub.com/Yazhen-L/First-Repo.mlflow/#/experiments/0)")
                         
                 except KeyError:
                     st.error("DAGSHUB_TOKEN has not been set up yet. Please check Streamlit Secrets.")
