@@ -916,13 +916,21 @@ elif page == "Prediction 📣":
                 st.error("PyCaret results file not found.")
             
             st.write("### ⚡️ Closer Look with PyCaret Experiments on MLFlow")
-            if st.button("🚀 Go to MLFlow Experiment Record Page"):
-                st.warning("⚠️ Are you sure you want to go to MLFlow page with PyCaret running records? This will be a different website page. ⏱️ If so, enter the Password: YES")
-                password = st.text_input("🔐 Enter Password to continue: ", type="password", key="pycaret_password")
-                if password:
-                    if password != "YES":
-                        st.error('Incorrect Password!')
-                        st.stop()
+
+            if "mlflow_access" not in st.session_state:
+            st.session_state["mlflow_access"] = False
+
+            if not st.session_state["mlflow_access"]:
+                if st.button("🚀 Go to MLFlow Experiment Record Page"):
+                    st.warning("⚠️ Are you sure you want to go to MLFlow page with PyCaret running records? This will be a different website page. ⏱️ If so, enter the Password: YES")
+                    password = st.text_input("🔐 Enter Password to continue: ", type="password", key="pycaret_password")
+                    if password:
+                        if password != "YES":
+                            st.error('Incorrect Password!')
+                            st.stop()
+                        else:
+                            st.session_state["mlflow_access"] = True
+                            st.rerun()
                     else:
                         os.environ["DAGSHUB_QUIET"] = "1"
                         try:
