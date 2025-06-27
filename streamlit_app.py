@@ -916,6 +916,7 @@ elif page == "Prediction 📣":
             
             st.write("### ⚡️ Compare Top 3 Regressors with PyCaret")
 
+            import os
             os.environ["DAGSHUB_QUIET"] = "1"
             try:
                 DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
