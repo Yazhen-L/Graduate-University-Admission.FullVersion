@@ -1211,6 +1211,9 @@ elif page == "MLFlow I Tracker 🚀":
         y = df["Chance of Admit"]
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 
+        st.warning("⚠️ Please be careful to select the number of models you want to run at the same time. Sometimes, the Streamlit platform works well.")
+        st.warning("⚠️ If not, please **decrease the number of selected models**, because the Streamlit platform has a running timeout. Thank you for your understanding!")
+        
         # Define model display names first
         model_names = [
             "01 DecisionTree",
@@ -1218,8 +1221,8 @@ elif page == "MLFlow I Tracker 🚀":
             "03 RandomForest",
             "04 XGBoost"
         ]
-
-        # Let user select models
+    
+        # Let user select models & Provide Warning Sign
         selected_models = st.multiselect(
             'Select models you are interested in:',
             model_names
