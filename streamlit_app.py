@@ -1169,17 +1169,17 @@ elif page == "MLFlow I Tracker 🚀":
 
         # Initialize DagsHub MLflow tracking
         # dagshub.init(repo_owner='Christinachen017', repo_name='Finalproject', mlflow=True)
-        try:
-                    os.environ["DAGSHUB_QUIET"] = "1"
-                    DAGSHUB_TOKEN = st.secrets["DAGSHUB_TOKEN"]
-                    repo_owner = "Christinachen017"
-                    repo_name = "Finalproject"
-                    
-                    tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
-                    mlflow.set_tracking_uri(tracking_uri)
-                    
-                    os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
-                    os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
+        try:        
+            os.environ["DAGSHUB_QUIET"] = "1"
+            DAGSHUB_TOKEN2 = st.secrets["DAGSHUB_TOKEN2"]
+            repo_owner = "Christinachen017"
+            repo_name = "Finalproject"
+            
+            tracking_uri = f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow"
+            mlflow.set_tracking_uri(tracking_uri)
+            
+            os.environ["MLFLOW_TRACKING_USERNAME"] = repo_owner
+            os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN2
         except KeyError:
                     st.error("DAGSHUB_TOKEN has not been set up yet. Please check Streamlit Secrets.")
         except Exception as e:
