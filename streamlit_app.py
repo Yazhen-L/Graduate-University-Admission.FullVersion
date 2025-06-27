@@ -935,7 +935,7 @@ elif page == "Prediction 📣":
             except FileNotFoundError:
                 st.error("PyCaret results file not found.")
             
-            st.write("### ⚡️ Closer Look with PyCaret Experiments on MLFlow")
+            st.write("### ⚡️ Closer Look for Top 3 Models on MLFlow")
 
             if "mlflow_access" not in st.session_state:
                 st.session_state["mlflow_access"] = False
@@ -949,7 +949,7 @@ elif page == "Prediction 📣":
             back_button = False
 
             if not st.session_state["mlflow_access"]:
-                if st.button("🚀 Go to MLFlow Experiment Record Page"):
+                if st.button("🚀 Go to MLFlow Experiment Record Page for PyCaret"):
                     st.session_state["show_password_input"] = True
 
             if st.session_state["show_password_input"]:
