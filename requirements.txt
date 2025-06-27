@@ -19,7 +19,7 @@ xgboost
 graphviz
 mlflow
 dagshub
-pycaret==3.3.1
+pycaret>=3.3.2
 torch
 shap
 streamlit-shap
