@@ -54,32 +54,6 @@ import sklearn.metrics as metrics
 plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
-def setup_environment():
-        graphviz_paths = [
-            '/usr/bin/graphviz/bin',
-            '/usr/local/bin',
-            '/usr/bin',
-            str(Path.home() / 'graphviz' / 'bin')
-        ]
-        
-        for path in graphviz_paths:
-            if Path(path).exists():
-                os.environ["PATH"] += os.pathsep + path
-        
-        try:
-            import graphviz
-            st.sidebar.success(f"Graphviz Python 库: {graphviz.__version__}")
-            
-            result = subprocess.run(['dot', '-V'], capture_output=True, text=True)
-            if result.returncode == 0:
-                st.sidebar.success(f"Graphviz: {result.stdout.strip()}")
-            else:
-                st.sidebar.warning("Graphviz is not found.")
-                st.sidebar.code(result.stderr)
-        except ImportError:
-            st.sidebar.error("Python graphviz cann't be downloaded.")
-setup_environment()
-
 
 # Load the dataset
 df = pd.read_csv("Admission_Predict_Ver1.1.csv")
